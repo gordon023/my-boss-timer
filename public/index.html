@@ -266,7 +266,7 @@
     <footer>Build by Punpun</footer>
   </div>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-   <!-- === SCRIPT UNTOUCHED EXCEPT UNIQUE BOSS LOCALSTORAGE === -->
+<!-- === SCRIPT UNTOUCHED EXCEPT UNIQUE BOSS LOCALSTORAGE === -->
 <script>
   const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1433449406056763557/nifC_lCD78cMTOoMY6ryDBlain76udKiIEVOitIWT_n8XqygjGj_GWU0zDEf8v6GTxGu";
 
@@ -455,7 +455,6 @@
       const mins = Math.floor(remain / 60000);
       const secs = Math.floor((remain % 60000) / 1000);
 
-      // voice alert for 3 minutes remaining
       if (mins === 3 && !u.alerted3min) {
         speakAlert(`${u.name} will spawn in three minutes.`);
         u.alerted3min = true;
@@ -498,8 +497,7 @@
   renderTimers();
   renderUniqueTimers();
 
-
-  const socket = io(); // auto-connect to same Render host
+  const socket = io();
 
   socket.on("init", (data) => {
     timers = data.bossTimers || [];
@@ -533,6 +531,26 @@
     _saveUniqueTimers();
     socket.emit("updateUnique", uniqueTimers);
   };
+</script>
+
+<!-- === FIX: Ensure Unique Boss Table Displays === -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const fixUniqueVisible = () => {
+    try {
+      const uniqueContainer = document.getElementById("uniqueContainer");
+      const uniqueBody = document.getElementById("uniqueBody");
+      if (uniqueContainer && uniqueBody && typeof renderUniqueTimers === "function") {
+        renderUniqueTimers();
+        uniqueContainer.style.display = "block";
+      }
+    } catch (err) {
+      console.warn("⚠️ Unique boss fix skipped:", err);
+    }
+  };
+  fixUniqueVisible();
+  setTimeout(fixUniqueVisible, 1000);
+});
 </script>
 
 </body>
