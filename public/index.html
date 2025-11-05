@@ -497,6 +497,45 @@
 
   renderTimers();
   renderUniqueTimers();
+
+    const socket = io("https://your-render-url.onrender.com"); // <-- replace with your Render server URL
+
+  // when connecting, fetch full state
+  socket.on("init", (data) => {
+    timers = data.bossTimers || [];
+    uniqueTimers = data.uniqueTimers || [];
+    saveTimers();
+    saveUniqueTimers();
+    renderTimers();
+    renderUniqueTimers();
+  });
+
+  // when another client updates field timers
+  socket.on("updateField", (newTimers) => {
+    timers = newTimers || [];
+    saveTimers();
+    renderTimers();
+  });
+
+  // when another client updates unique timers
+  socket.on("updateUnique", (newTimers) => {
+    uniqueTimers = newTimers || [];
+    saveUniqueTimers();
+    renderUniqueTimers();
+  });
+
+  // patch existing local functions to push updates to server
+  const oldSaveTimers = saveTimers;
+  saveTimers = function () {
+    oldSaveTimers();
+    socket.emit("updateField", timers);
+  };
+
+  const oldSaveUniqueTimers = saveUniqueTimers;
+  saveUniqueTimers = function () {
+    oldSaveUniqueTimers();
+    socket.emit("updateUnique", uniqueTimers);
+  };
 </script>
 
 </body>
