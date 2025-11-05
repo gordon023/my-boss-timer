@@ -265,7 +265,7 @@
 
     <footer>Build by Punpun</footer>
   </div>
-
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
    <!-- === SCRIPT UNTOUCHED EXCEPT UNIQUE BOSS LOCALSTORAGE === -->
 <script>
   const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1433449406056763557/nifC_lCD78cMTOoMY6ryDBlain76udKiIEVOitIWT_n8XqygjGj_GWU0zDEf8v6GTxGu";
@@ -498,9 +498,9 @@
   renderTimers();
   renderUniqueTimers();
 
-    const socket = io("https://your-render-url.onrender.com"); // <-- replace with your Render server URL
 
-  // when connecting, fetch full state
+  const socket = io(); // auto-connect to same Render host
+
   socket.on("init", (data) => {
     timers = data.bossTimers || [];
     uniqueTimers = data.uniqueTimers || [];
@@ -510,30 +510,27 @@
     renderUniqueTimers();
   });
 
-  // when another client updates field timers
   socket.on("updateField", (newTimers) => {
     timers = newTimers || [];
     saveTimers();
     renderTimers();
   });
 
-  // when another client updates unique timers
   socket.on("updateUnique", (newTimers) => {
     uniqueTimers = newTimers || [];
     saveUniqueTimers();
     renderUniqueTimers();
   });
 
-  // patch existing local functions to push updates to server
-  const oldSaveTimers = saveTimers;
+  const _saveTimers = saveTimers;
   saveTimers = function () {
-    oldSaveTimers();
+    _saveTimers();
     socket.emit("updateField", timers);
   };
 
-  const oldSaveUniqueTimers = saveUniqueTimers;
+  const _saveUniqueTimers = saveUniqueTimers;
   saveUniqueTimers = function () {
-    oldSaveUniqueTimers();
+    _saveUniqueTimers();
     socket.emit("updateUnique", uniqueTimers);
   };
 </script>
